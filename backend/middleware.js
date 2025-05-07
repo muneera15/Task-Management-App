@@ -2,7 +2,7 @@ const jwt = require("jsonwebtoken");
 
 const authMiddleware = (req,res,next)=>{
     const authorization = req.headers.authorization;
-    if(!authorization || !authorization.startsWith("Bearer ")){
+    if(!authorization){
         return res.status(403).json({
             message : "Invalid"
         })

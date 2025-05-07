@@ -73,21 +73,29 @@ export const ProjectTasks = () => {
   return (
     <div className='p-4'>
       <div className='flex justify-between items-center mb-4'>
+        <div>
         <h1 className='text-2xl font-semibold'>{project?.title}</h1>
         <p>{project?.description}</p>
+        </div>
+        <div className='flex'>
+          <button onClick={()=>navigate(`/projects/${p._id}`)}  className="bg-blue-600 align-center text-white text-sm font-medium px-4 py-2 rounded hover:bg-blue-700">
+          View Projects
+        </button>
         <button onClick={() => setShowModal(true)} className='bg-blue-500 text-white px-4 align-right py-1 rounded'>Add Task</button>
+        </div>
       </div>
 
       {/* Filter controls */}
       <div className='flex gap-4 mb-4'>
+        Filter By
         <select value={status} onChange={e => setStatus(e.target.value)} className='border px-2 py-1'>
-          <option>All</option>
-          <option>Pending</option>
+          <option> All </option>
           <option>In Progress</option>
           <option>Completed</option>
         </select>
+        Sort By 
         <select value={priority} onChange={e => setPriority(e.target.value)} className='border px-2 py-1'>
-          <option>All</option>
+          <option> All </option>
           <option>High</option>
           <option>Medium</option>
           <option>Low</option>
@@ -100,21 +108,20 @@ export const ProjectTasks = () => {
           <div key={t._id} className='bg-gray-100 p-4 rounded'>
             <div className='flex justify-between'>
               <div>
-                <h2 className='text-lg font-semibold'>{t?.title}</h2>
-                <p className='text-sm'>{t?.description}</p>
+                <h2 className='text-lg font-semibold mb-2'>{t?.title}</h2>
+                <p className='text-sm text-gray-600 mb-4'>{t?.description}</p>
                 <p className='text-xs text-gray-600'>Due date: {t.dueDate?.slice(0, 10)}</p>
               </div>
               <div className='text-right'>
-                <span className={`text-xs px-2 py-1 rounded ${t.status === 'Completed' ? 'bg-green-200' : t.status === 'In Progress' ? 'bg-yellow-200' : 'bg-gray-200'}`}>{t.status}</span>
-                <div className='mt-2 flex gap-2'>
-                  <button onClick={() => updateTaskStatus(t._id, 'Completed')} className='text-green-600 text-sm'>Mark Complete</button>
-                  <button onClick={() => updateTaskStatus(t._id, 'Pending')} className='text-red-600 text-sm'>Mark Incomplete</button>
+                <div className='flep items-center'>
+                  <div className={t.priority === "High" ? "bg-red-200" : t.priority === "Medium" ? "bg-yellow-200": "bg-green-200"}> {t.priority} </div>
+              <input type='checkBox' checked={t.status === "Completed"} onChange={(event) => updateTaskStatus(t._id, event.target.checked ? "Completed" : "In Progress")} className='text-green-600 text-sm p-2'/>
+                <span className={`text-xs px-2 py-1 rounded ${t.status === 'Completed' ? 'bg-green-200' :'bg-yellow-200'}`}>{t.status}</span>
                 </div>
-                <div className='mt-2 flex gap-2'>
-                  <FontAwesomeIcon icon={faPenToSquare} className="cursor-pointer text-blue-600" onClick={() => handleEditTask(t)} />
+                <div className='mt-2 flex gap-4'>
+                  <FontAwesomeIcon icon={faPenToSquare} className="cursor-pointer text-black-600" onClick={() => handleEditTask(t)} />
                   <FontAwesomeIcon icon={faTrash} className="cursor-pointer text-black-600" onClick={() => deleteTask(t._id)} />
                 </div>
-
               </div>
             </div>
           </div>
@@ -164,7 +171,7 @@ export const ProjectTasks = () => {
               <div className="flex justify-end gap-2">
                 <button
                   type="button"
-                  onClick={() => setShowModal(false)}
+                  onClick={() => {setShowModal(false); setEditTask(false)}}
                   className="px-4 py-2 border rounded text-gray-700"
                 >
                   Cancel
@@ -172,7 +179,7 @@ export const ProjectTasks = () => {
                 <button
                   type="submit"
                   className="bg-blue-600 text-white px-4 py-2 rounded">
-                  Add Task
+                  {(editTask) ? "Save" :"Add Task"}
                 </button>
               </div>
             </form>

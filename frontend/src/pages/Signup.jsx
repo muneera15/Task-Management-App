@@ -38,16 +38,16 @@ export const Signup=()=>{
            <Heading label = {"Sign up"}/>
            <SubHeading label ={"Enter your credentials to access your account"}/>
            
-           <InputBox onChange={e => {
+           <InputBox type="name" onChange={e => {
           setFirstName(e.target.value);
         }} placeholder="Muneera" label={"First Name"} />
-        <InputBox onChange={(e) => {
+        <InputBox type="name" onChange={(e) => {
           setLastName(e.target.value);
         }} placeholder="Shaik" label={"Last Name"} />
-        <InputBox onChange={e => {
+        <InputBox type="email" onChange={e => {
           setUserName(e.target.value);
         }} placeholder="Email/Mobile" label={"Username"} />
-        <InputBox onChange={(e) => {
+        <InputBox type="password" onChange={(e) => {
           setPassword(e.target.value)
         }} placeholder="******" label={"Password"} />
         <div className="pt-4">

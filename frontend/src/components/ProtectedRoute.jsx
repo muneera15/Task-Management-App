@@ -1,8 +1,15 @@
-import {useNavigate} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 
-const navigate = useNavigate();
-
-export const ProtectedRoute=({Component})=>{
+export const ProtectedRoute = ({ children }) => {
+    const navigate = useNavigate();
     const token = localStorage.getItem("token");
-    return token ? <Component/> : navigate("/login");
-}
+
+    useEffect(() => {
+        if (!token) {
+            navigate("/login");
+        }
+    }, [token, navigate]);
+
+    return token ? children : null;
+};

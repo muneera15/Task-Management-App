@@ -31,11 +31,16 @@ export const Projects=()=>{
   };
   
   return (
+    <div className="bg-white rounded-lg shadow-md p-6">
+  <h1 className="text-2xl font-bold text-gray-800 mb-6">Projects</h1>
     <div className="p-4">
-      <button onClick={() => setShowModal(true)}
-        className="bg-blue-600 text-white px-4 py-2 rounded">
-        Add Project
-      </button>
+      <div className='flex justify-between'>
+        <div></div>
+        <button onClick={() => setShowModal(true)}
+          className="bg-blue-600 text-white text-sm font-medium px-4 py-2 rounded-[15px] hover:bg-blue-700">
+          Add Project
+        </button>
+      </div>
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
           <div className="bg-white p-6 rounded-lg w-full max-w-md shadow-lg">
@@ -85,15 +90,26 @@ export const Projects=()=>{
           </div>
         </div>
       )}
+      <div></div>
       <div className="mt-6">
         {projects.map(p => (
-          <div onClick={()=>navigate(`/projects/${p._id}`)}key={p._id} className="p-4 border rounded mb-3">
-            <h3 className="font-bold">{p.title}</h3>
-            <p>{p.description}</p>
-            <p className="text-sm text-gray-500">Owner: {p.owner}</p>
-          </div>
+          <div key={p._id} className="border border-gray-200 rounded-lg p-4 mb-4 hover:bg-gray-50 transition-colors">
+            <div className="flex justify-between items-start">
+            <div>
+            <h3 className="text-lg font-semibold text-gray-800">{p.title}</h3>
+            <p className='text-sm text-gray-600 mt-1'>{p.description}</p>
+            <p className="text-sm text-gray-500">Created By: {p.owner}</p>
+            </div>
+            <div className="flex items-end">
+        <button onClick={()=>navigate(`/projects/${p._id}`)}  className="bg-blue-600 text-white text-sm font-medium px-4 py-2 rounded-[15px] hover:bg-blue-700">
+          View Tasks
+        </button>
+      </div>
+      </div>
+      </div>
         ))}
       </div>
+    </div>
     </div>
   );
 }
