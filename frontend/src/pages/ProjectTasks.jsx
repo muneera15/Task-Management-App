@@ -1,191 +1,418 @@
-import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import axios from '../utils/axios';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTrash, faPenToSquare } from '@fortawesome/free-solid-svg-icons';
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import axios from "../utils/axios";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faTrash, faPenToSquare } from "@fortawesome/free-solid-svg-icons";
+import { Navbar } from "../components/Navbar";
 
 export const ProjectTasks = () => {
   const { projectId } = useParams();
   const [project, setProject] = useState(null);
   const [tasks, setTasks] = useState([]);
-  const [status, setStatus] = useState('All');
-  const [priority, setPriority] = useState('All');
+  const [status, setStatus] = useState("All");
+  const [priority, setPriority] = useState("All");
   const [showModal, setShowModal] = useState(false);
-  const [editTask,setEditTask]=useState(false);
+  const [editTask, setEditTask] = useState(false);
 
   const [formData, setFormData] = useState({
-    title: '',
-    description: '',
-    priority: '',
-    dueDate: '',
+    title: "",
+    description: "",
+    priority: "Medium",
+    dueDate: "",
   });
 
   useEffect(() => {
-    axios.get(`/api/projects/projectInfo/${projectId}`).then(res => setProject(res.data[0]));
-    axios.get(`/api/projects/${projectId}/tasks`).then(res => setTasks(res.data));
+    axios
+      .get(`/api/projects/projectInfo/${projectId}`)
+      .then((res) => setProject(res.data[0]));
+    axios
+      .get(`/api/projects/${projectId}/tasks`)
+      .then((res) => setTasks(res.data));
   }, [projectId]);
 
-  const filteredTasks = tasks.filter(t => {
-    return (status === 'All' || t.status === status) && (priority === 'All' || t.priority === priority);
+  const filteredTasks = tasks.filter((t) => {
+    return (
+      (status === "All" || t.status === status) &&
+      (priority === "All" || t.priority === priority)
+    );
   });
 
   const updateTaskStatus = (taskId, status) => {
-    axios.patch(`/api/projects/${projectId}/tasks/${taskId}`, { status }).then(res => {
-      setTasks(prev => prev.map(t => (t._id === taskId ? res.data : t)));
-    });
+    axios
+      .patch(`/api/projects/${projectId}/tasks/${taskId}`, { status })
+      .then((res) => {
+        setTasks((prev) => prev.map((t) => (t._id === taskId ? res.data : t)));
+      });
   };
 
-  const handleChange = e => {
-    setFormData(res => ({ ...res, [e.target.name]: e.target.value }));
+  const handleChange = (e) => {
+    setFormData((res) => ({ ...res, [e.target.name]: e.target.value }));
   };
 
   const addTask = async (e) => {
-  e.preventDefault();
-  if (editTask) {
-    const res = await axios.patch(`/api/projects/${projectId}/tasks/${editTask._id}`, formData);
-    setTasks(prev => prev.map(t => (t._id === editTask._id ? res.data : t)));
-    setEditTask(false);
-  } else {
-    const res = await axios.post(`/api/projects/${projectId}/tasks/create`, formData);
-    setTasks(prev => [...prev, res.data]);
-  }
-  setFormData({ title: '', description: '', priority: 'Medium', dueDate: '' });
-  setShowModal(false);
-};
-
+    e.preventDefault();
+    if (editTask) {
+      const res = await axios.patch(
+        `/api/projects/${projectId}/tasks/${editTask._id}`,
+        formData
+      );
+      setTasks((prev) =>
+        prev.map((t) => (t._id === editTask._id ? res.data : t))
+      );
+      setEditTask(false);
+    } else {
+      const res = await axios.post(
+        `/api/projects/${projectId}/tasks/create`,
+        formData
+      );
+      setTasks((prev) => [...prev, res.data]);
+    }
+    setFormData({
+      title: "",
+      description: "",
+      priority: "Medium",
+      dueDate: "",
+    });
+    setShowModal(false);
+  };
 
   const handleEditTask = (task) => {
-    setEditTask(task); // store the task being edited
+    setEditTask(task);
     setFormData({
-      title: task.title || '',
-      description: task.description || '',
-      priority: task.priority || 'Medium',
-      dueDate: task.dueDate?.slice(0, 10) || '',
+      title: task.title || "",
+      description: task.description || "",
+      priority: task.priority || "Medium",
+      dueDate: task.dueDate?.slice(0, 10) || "",
     });
     setShowModal(true);
   };
-  
+
+  const initializeFormData = () => {
+    setFormData({
+      title: "",
+      description: "",
+      priority: "Medium",
+      dueDate: "",
+    });
+    setShowModal(true);
+  };
+
   const deleteTask = async (taskId) => {
     await axios.delete(`/api/projects/${projectId}/tasks/${taskId}`);
-    setTasks(prev => prev.filter(t => t._id !== taskId));
+    setTasks((prev) => prev.filter((t) => t._id !== taskId));
+  };
+
+  // Status and priority badge colors
+  const statusClasses = {
+    Completed: "bg-green-100 text-green-800",
+    "In Progress": "bg-blue-100 text-blue-800",
+  };
+
+  const priorityClasses = {
+    High: "bg-red-100 text-red-800",
+    Medium: "bg-yellow-100 text-yellow-800",
+    Low: "bg-green-100 text-green-800",
   };
 
   return (
-    <div className='p-4'>
-      <div className='flex justify-between items-center mb-4'>
-        <div>
-        <h1 className='text-2xl font-semibold'>{project?.title}</h1>
-        <p>{project?.description}</p>
+    <div>
+      <Navbar />
+      <div className="p-6 max-w-4xl mx-auto">
+        <div className="flex justify items-start mb-6">
+          <div>
+            <svg
+              className="w-6 h-6 text-gray-800 dark:text"
+              aria-hidden="true"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 8 14"
+            >
+              <path
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M7 1 1.3 6.326a.91.91 0 0 0 0 1.348L7 13"
+              />
+            </svg>
+            <h1 className="text-3xl font-bold text-gray-800">
+              {project?.title}
+            </h1>
+            <p className="text-gray-600 mt-1">{project?.description}</p>
+          </div>
+          <div className="flex">
+            <button
+              onClick={() => initializeFormData()}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow transition-colors"
+            >
+              Add Task
+            </button>
+          </div>
         </div>
-        <div className='flex'>
-          <button onClick={()=>navigate(`/projects/${p._id}`)}  className="bg-blue-600 align-center text-white text-sm font-medium px-4 py-2 rounded hover:bg-blue-700">
-          View Projects
-        </button>
-        <button onClick={() => setShowModal(true)} className='bg-blue-500 text-white px-4 align-right py-1 rounded'>Add Task</button>
-        </div>
-      </div>
 
-      {/* Filter controls */}
-      <div className='flex gap-4 mb-4'>
-        Filter By
-        <select value={status} onChange={e => setStatus(e.target.value)} className='border px-2 py-1'>
-          <option> All </option>
-          <option>In Progress</option>
-          <option>Completed</option>
-        </select>
-        Sort By 
-        <select value={priority} onChange={e => setPriority(e.target.value)} className='border px-2 py-1'>
-          <option> All </option>
-          <option>High</option>
-          <option>Medium</option>
-          <option>Low</option>
-        </select>
-      </div>
-
-      {/* Task Cards */}
-      <div className='space-y-4'>
-        {filteredTasks.map(t => (
-          <div key={t._id} className='bg-gray-100 p-4 rounded'>
-            <div className='flex justify-between'>
-              <div>
-                <h2 className='text-lg font-semibold mb-2'>{t?.title}</h2>
-                <p className='text-sm text-gray-600 mb-4'>{t?.description}</p>
-                <p className='text-xs text-gray-600'>Due date: {t.dueDate?.slice(0, 10)}</p>
-              </div>
-              <div className='text-right'>
-                <div className='flep items-center'>
-                  <div className={t.priority === "High" ? "bg-red-200" : t.priority === "Medium" ? "bg-yellow-200": "bg-green-200"}> {t.priority} </div>
-              <input type='checkBox' checked={t.status === "Completed"} onChange={(event) => updateTaskStatus(t._id, event.target.checked ? "Completed" : "In Progress")} className='text-green-600 text-sm p-2'/>
-                <span className={`text-xs px-2 py-1 rounded ${t.status === 'Completed' ? 'bg-green-200' :'bg-yellow-200'}`}>{t.status}</span>
-                </div>
-                <div className='mt-2 flex gap-4'>
-                  <FontAwesomeIcon icon={faPenToSquare} className="cursor-pointer text-black-600" onClick={() => handleEditTask(t)} />
-                  <FontAwesomeIcon icon={faTrash} className="cursor-pointer text-black-600" onClick={() => deleteTask(t._id)} />
-                </div>
-              </div>
+        {/* Filter controls */}
+        <div className="flex gap-4 mb-6">
+          <div className="relative">
+            <select
+              value={status}
+              onChange={(e) => setStatus(e.target.value)}
+              className="appearance-none bg-white border border-gray-300 rounded-md pl-3 pr-8 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            >
+              <option value="All">All Statuses</option>
+              <option value="In Progress">In Progress</option>
+              <option value="Completed">Completed</option>
+            </select>
+            <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+              <svg
+                className="h-4 w-4 text-gray-500"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M19 9l-7 7-7-7"
+                />
+              </svg>
             </div>
           </div>
-        ))}
-      </div>
 
-      {/* Modal Form */}
-      {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
-          <div className="bg-white p-6 rounded-lg w-full max-w-md shadow-lg">
-            <h2 className="text-xl font-semibold mb-4">{(editTask) ? "Edit Task" : "Add New Task" }</h2>
-            <form onSubmit={addTask} className="space-y-4">
-              <input
-                type="text"
-                name="title"
-                placeholder="Task Title"
-                value={formData.title}
-                onChange={handleChange}
-                className="w-full border px-3 py-2 rounded"
-                required
-              />
-              <textarea
-                name="description"
-                placeholder="Task Description"
-                value={formData.description}
-                onChange={handleChange}
-                className="w-full border px-3 py-2 rounded"
-              />
-              <select
-                name="priority"
-                value={formData.priority}
-                onChange={handleChange}
-                className="w-full border px-3 py-2 rounded"
+          <div className="relative">
+            <select
+              value={priority}
+              onChange={(e) => setPriority(e.target.value)}
+              className="appearance-none bg-white border border-gray-300 rounded-md pl-3 pr-8 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            >
+              <option value="All">All Priorities</option>
+              <option value="High">High</option>
+              <option value="Medium">Medium</option>
+              <option value="Low">Low</option>
+            </select>
+            <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+              <svg
+                className="h-4 w-4 text-gray-500"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
               >
-                <option value="High">High</option>
-                <option value="Medium">Medium</option>
-                <option value="Low">Low</option>
-              </select>
-              <input
-                type="date"
-                name="dueDate"
-                value={formData.dueDate}
-                onChange={handleChange}
-                className="w-full border px-3 py-2 rounded"
-                required
-              />
-              <div className="flex justify-end gap-2">
-                <button
-                  type="button"
-                  onClick={() => {setShowModal(false); setEditTask(false)}}
-                  className="px-4 py-2 border rounded text-gray-700"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="bg-blue-600 text-white px-4 py-2 rounded">
-                  {(editTask) ? "Save" :"Add Task"}
-                </button>
-              </div>
-            </form>
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M19 9l-7 7-7-7"
+                />
+              </svg>
+            </div>
           </div>
         </div>
-      )}
+
+        {/* Task Cards */}
+        <div className="space-y-4">
+          {filteredTasks.length === 0 ? (
+            <div className="text-center py-8 text-gray-500">
+              No tasks found matching your filters
+            </div>
+          ) : (
+            filteredTasks.map((t) => (
+              <div
+                key={t._id}
+                className="bg-white p-4 rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow"
+              >
+                <div className="flex justify-between">
+                  <div className="flex-1">
+                    <div className="flex items-start gap-3">
+                      <span
+                        className={`text-xs font-medium px-2 py-1 rounded-full ${
+                          priorityClasses[t.priority]
+                        }`}
+                      >
+                        {t.priority}
+                      </span>
+                      <h2 className="text-lg font-semibold text-gray-800">
+                        {t.title}
+                      </h2>
+                    </div>
+                    <p className="text-sm text-gray-600 mt-2">
+                      {t.description}
+                    </p>
+                    <div className="mt-3 flex items-center gap-4">
+                      <span
+                        className={`text-xs font-medium px-2 py-1 rounded-full ${
+                          statusClasses[t.status]
+                        }`}
+                      >
+                        {t.status}
+                      </span>
+                      <span className="text-xs text-gray-500">
+                        Due: {new Date(t.dueDate).toLocaleDateString()}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col items-end gap-2">
+                    <div className="flex gap-3">
+                      <button
+                        onClick={() => handleEditTask(t)}
+                        className="text-blue-600 hover:text-blue-800 transition-colors"
+                        title="Edit"
+                      >
+                        <FontAwesomeIcon
+                          icon={faPenToSquare}
+                          className="h-4 w-4"
+                        />
+                      </button>
+                      <button
+                        onClick={() => deleteTask(t._id)}
+                        className="text-red-600 hover:text-red-800 transition-colors"
+                        title="Delete"
+                      >
+                        <FontAwesomeIcon icon={faTrash} className="h-4 w-4" />
+                      </button>
+                    </div>
+
+                    <div className="flex gap-2 mt-2">
+                      {t.status !== "Completed" && (
+                        <button
+                          onClick={() => updateTaskStatus(t._id, "Completed")}
+                          className="text-xs bg-green-100 hover:bg-green-200 text-green-800 px-2 py-1 rounded transition-colors"
+                        >
+                          Mark Complete
+                        </button>
+                      )}
+                      {t.status !== "In Progress" && (
+                        <button
+                          onClick={() => updateTaskStatus(t._id, "In Progress")}
+                          className="text-xs bg-gray-100 solid hover:bg-gray-200 text-gray-800 px-2 py-1 rounded transition-colors"
+                        >
+                          Re open
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+
+        {/* Modal Form */}
+        {showModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
+            <div className="bg-white p-6 rounded-lg w-full max-w-md shadow-xl">
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-xl font-semibold text-gray-800">
+                  {editTask ? "Edit Task" : "Add New Task"}
+                </h2>
+                <button
+                  onClick={() => {
+                    setShowModal(false);
+                    setEditTask(false);
+                  }}
+                  className="text-gray-500 hover:text-gray-700"
+                >
+                  <svg
+                    className="h-6 w-6"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
+                </button>
+              </div>
+
+              <form onSubmit={addTask} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Task Title
+                  </label>
+                  <input
+                    type="text"
+                    name="title"
+                    placeholder="Enter task title"
+                    value={formData.title}
+                    onChange={handleChange}
+                    className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Description
+                  </label>
+                  <textarea
+                    name="description"
+                    placeholder="Enter task description"
+                    value={formData.description}
+                    onChange={handleChange}
+                    rows={3}
+                    className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Priority
+                    </label>
+                    <select
+                      name="priority"
+                      value={formData.priority}
+                      onChange={handleChange}
+                      className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    >
+                      <option value="High">High</option>
+                      <option value="Medium">Medium</option>
+                      <option value="Low">Low</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Due Date
+                    </label>
+                    <input
+                      type="date"
+                      name="dueDate"
+                      value={formData.dueDate}
+                      onChange={handleChange}
+                      className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className="flex justify-end gap-3 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowModal(false);
+                      setEditTask(false);
+                    }}
+                    className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors"
+                  >
+                    {editTask ? "Update Task" : "Add Task"}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

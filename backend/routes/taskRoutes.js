@@ -35,16 +35,6 @@ router.post("/tasks/create",async(req,res)=>{
     }
 })
 
-router.put("/tasks/:tid",async(req,res)=>{
-    const body =req.body;
-    const updatedTask = await Task.findOneAndUpdate({ 
-        _id: req.params.tid, 
-        userId: req.userId}, 
-        ...body, 
-        { new: true });
-    res.json(updatedTask);
-})
-
 router.patch("/tasks/:tid",async(req,res)=>{
     const updatedTask = await Task.findOneAndUpdate({
         _id:req.params.tid,
