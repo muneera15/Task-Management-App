@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { Navigate, useParams } from "react-router-dom";
 import axios from "../utils/axios";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash, faPenToSquare } from "@fortawesome/free-solid-svg-icons";
 import { Navbar } from "../components/Navbar";
+import { useNavigate } from "react-router-dom";
 
 export const ProjectTasks = () => {
   const { projectId } = useParams();
@@ -13,7 +14,7 @@ export const ProjectTasks = () => {
   const [priority, setPriority] = useState("All");
   const [showModal, setShowModal] = useState(false);
   const [editTask, setEditTask] = useState(false);
-
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -102,10 +103,9 @@ export const ProjectTasks = () => {
     setTasks((prev) => prev.filter((t) => t._id !== taskId));
   };
 
-  // Status and priority badge colors
   const statusClasses = {
     Completed: "bg-green-100 text-green-800",
-    "In Progress": "bg-blue-100 text-blue-800",
+    Pending: "bg-blue-100 text-blue-800",
   };
 
   const priorityClasses = {
@@ -118,10 +118,11 @@ export const ProjectTasks = () => {
     <div>
       <Navbar />
       <div className="p-6 max-w-4xl mx-auto">
-        <div className="flex justify items-start mb-6">
-          <div>
+        <div className="flex justify mb-6">
+          <div className="mt-3 mr-3 p-1 cursor-pointer">
             <svg
-              className="w-6 h-6 text-gray-800 dark:text"
+              onClick={() => navigate("/projects")}
+              className="w-4 h-4 text-gray-800 dark:text"
               aria-hidden="true"
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -129,24 +130,28 @@ export const ProjectTasks = () => {
             >
               <path
                 stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
                 d="M7 1 1.3 6.326a.91.91 0 0 0 0 1.348L7 13"
               />
             </svg>
-            <h1 className="text-3xl font-bold text-gray-800">
-              {project?.title}
-            </h1>
-            <p className="text-gray-600 mt-1">{project?.description}</p>
           </div>
-          <div className="flex">
-            <button
-              onClick={() => initializeFormData()}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow transition-colors"
-            >
-              Add Task
-            </button>
+          <div className="flex justify-between w-full">
+            <div className="w-3/4">
+              <h1 className="text-2xl font-bold text-gray-800 m-2">
+                {project?.title}
+              </h1>
+              <p className="text-gray-600">{project?.description}</p>
+            </div>
+            <div className="mt-3">
+              <button
+                onClick={() => initializeFormData()}
+                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow transition-colors"
+              >
+                Add Task
+              </button>
+            </div>
           </div>
         </div>
 
@@ -159,7 +164,7 @@ export const ProjectTasks = () => {
               className="appearance-none bg-white border border-gray-300 rounded-md pl-3 pr-8 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             >
               <option value="All">All Statuses</option>
-              <option value="In Progress">In Progress</option>
+              <option value="Pending">Pending</option>
               <option value="Completed">Completed</option>
             </select>
             <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
@@ -276,15 +281,15 @@ export const ProjectTasks = () => {
                       {t.status !== "Completed" && (
                         <button
                           onClick={() => updateTaskStatus(t._id, "Completed")}
-                          className="text-xs bg-green-100 hover:bg-green-200 text-green-800 px-2 py-1 rounded transition-colors"
+                          className="text-xs bg-green-100 hover:bg-green-200 text-green-800 px-2 py-1 rounded transition-colors border-2 border-solid border-green-400 shadow-md"
                         >
                           Mark Complete
                         </button>
                       )}
-                      {t.status !== "In Progress" && (
+                      {t.status !== "Pending" && (
                         <button
-                          onClick={() => updateTaskStatus(t._id, "In Progress")}
-                          className="text-xs bg-gray-100 solid hover:bg-gray-200 text-gray-800 px-2 py-1 rounded transition-colors"
+                          onClick={() => updateTaskStatus(t._id, "Pending")}
+                          className="text-xs bg-gray-100 solid hover:bg-gray-200 text-gray-800 px-2 py-1 rounded transition-colors border-2 border-solid border-current shadow-md"
                         >
                           Re open
                         </button>

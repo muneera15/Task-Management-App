@@ -7,7 +7,7 @@ const instance = axios.create({
 
 instance.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token'); // or use context/state if preferred
+    const token = localStorage.getItem('token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -16,15 +16,12 @@ instance.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Response Interceptor (Optional: handle errors globally)
+// Response Interceptor
 instance.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // Optionally redirect to login or show message
       console.warn("Unauthorized! Logging out...");
-      // localStorage.removeItem('token');
-      // window.location.href = '/login';
     }
     return Promise.reject(error);
   }

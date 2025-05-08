@@ -5,13 +5,10 @@ export const Navbar = () => {
   const navigate = useNavigate();
   const [showDropdown, setShowDropdown] = useState(false);
   
-  // Mock user data - replace with actual user data from your auth system
   const username = localStorage.getItem("user");
-  const name = JSON.parse(username).user
-  console.log(name);
+  const name = JSON.parse(username)
   const handleLogout = () => {
     localStorage.removeItem("token");
-    setUser(null);
     navigate("/login");
   };
 

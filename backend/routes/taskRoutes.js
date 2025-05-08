@@ -4,12 +4,6 @@ const router = express.Router({ mergeParams: true });
 
 
 router.get("/tasks", async (req, res) => {
-  // const { project, status, priority } = req.query;
-  // const filter = { user: req.userId };
-  // if (project) filter.project = project;
-  // if (status && status !== "All") filter.status = status;
-  // if (priority && priority !== "All") filter.priority = priority;
-
   try {
     const tasks = await Task.find({ userId : req.userId, projectId : req.params.projectId});
     res.json(tasks);
