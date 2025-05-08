@@ -38,7 +38,7 @@ export const Signup = () => {
           <SubHeading label={"Enter your credentials to access your account"} />
 
           <InputBox
-            type="name"
+            type="text"
             onChange={(e) => {
               setFirstName(e.target.value);
             }}
@@ -46,7 +46,7 @@ export const Signup = () => {
             label={"First Name"}
           />
           <InputBox
-            type="name"
+            type="text"
             onChange={(e) => {
               setLastName(e.target.value);
             }}
