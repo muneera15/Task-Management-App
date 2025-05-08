@@ -141,7 +141,6 @@ export const Projects = () => {
                         className="text-red-600 hover:text-red-800 transition-colors"
                         title="Delete"
                       >
-                        {" "}
                         <FontAwesomeIcon
                           icon={faTrash}
                           className="h-4 pr-0 w-4"

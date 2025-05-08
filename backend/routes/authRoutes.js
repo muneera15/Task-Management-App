@@ -7,20 +7,20 @@ const router = express.Router();
 
 const signupSchema = zod.object({
     username : zod.string().email(),
-    password : zod.string(),
+    password : zod.string().min(1, "Password is required"),
     firstName : zod.string(),
     lastName : zod.string()
 })
 
 router.post("/signup",async(req,res)=>{
     const body = req.body;
-    const obj = signupSchema.safeParse(body);
-    console.log(obj,body);
-    if(!obj.success){
-        return res.status(200).json({
-            message: "Invalid inputs"
-        })
+    const result = loginSchema.safeParse(body);
+    if (!result.success) {
+      return res.status(400).json({
+        message: result.error.errors[0].message
+      });
     }
+
     const existingUser = await User.findOne({
         username : body.username
     })
@@ -43,21 +43,21 @@ router.post("/signup",async(req,res)=>{
     })
 })
 
-const loginSchema = zod.object({
-    username : zod.string().email(),
-    password : zod.string()
-   })
   
-router.post("/login", async (req,res)=>{
+    const loginSchema = zod.object({
+    username: zod.string().email("Username must be a valid email"),
+    password: zod.string().min(1, "Password is required"),
+  });
+  
+  router.post("/login", async (req, res) => {
     const body = req.body;
-    console.log(body);
-    const obj = loginSchema.safeParse(body)
-    console.log(obj);
-    if(! obj.success){
-      return res.status(200).json({
-        message : "Incorrect inputs"
-      })
+    const result = loginSchema.safeParse(body);
+    if (!result.success) {
+      return res.status(400).json({
+        message: result.error.errors[0].message
+      });
     }
+
     const user = await User.findOne({
       username : body.username,
       password : body.password
